@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    alias(libs.plugins.spring.boot)
+}
+
+group 'bullish.store'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation libs.log4j.slf4j
+    implementation libs.logback
+    implementation libs.bundles.spring
+
+    runtimeOnly libs.h2
+
+    // tests
+    testImplementation testLibs.jupiter.api
+    testRuntimeOnly testLibs.jupiter.engine
+    testRuntimeOnly libs.h2
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events("failed")
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        exceptionFormat = "full"
+    }
+
+    reports {
+        junitXml.required = true
+    }
+
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: $descriptor")
+    }
+
+    afterSuite { desc, result ->
+        if (desc.parent == null) {
+            println "Testing Finished - Results: ${result.resultType} " +
+                    "(${result.testCount} tests, " +
+                    "${result.successfulTestCount} successes, " +
+                    "${result.failedTestCount} failures, " +
+                    "${result.skippedTestCount} skipped)"
+        }
+    }
+
+    minHeapSize = "2048m"
+    maxHeapSize = "4096m"
+    jvmArgs "-Duser.timezone=Asia/Hong_Kong"
+}
+
+java {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}

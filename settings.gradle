@@ -1,0 +1,28 @@
+rootProject.name = 'bullish-store'
+
+// central place for all dependencies which are shared with the same version between modules
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            // logging
+            library("logback", "ch.qos.logback", "logback-classic").version("1.4.5")
+            library("log4j-slf4j", "org.apache.logging.log4j", "log4j-to-slf4j").version("2.19.0")
+
+            // spring
+            def springVersion = version("spring.version", "3.1.2")
+            plugin("spring.boot", "org.springframework.boot").versionRef(springVersion)
+            library("spring.web", "org.springframework.boot", "spring-boot-starter-web").versionRef(springVersion)
+            library("spring.data.jpa", "org.springframework.boot", "spring-boot-starter-data-jpa").versionRef(springVersion)
+            library("spring.hateoas", "org.springframework.boot", "spring-boot-starter-hateoas").versionRef(springVersion)
+            bundle("spring", ["spring.web", "spring.data.jpa", "spring.hateoas"])
+
+            // database
+            library("h2", "com.h2database", "h2").version("2.2.220")
+        }
+        testLibs {
+            def junitVersion = version("junit.version", "5.8.1")
+            library("jupiter.api", "org.junit.jupiter", "junit-jupiter-api").versionRef(junitVersion)
+            library("jupiter.engine", "org.junit.jupiter", "junit-jupiter-engine").versionRef(junitVersion)
+        }
+    }
+}
