@@ -1,1 +1,1 @@
-# bullish-store
+# Store REST API

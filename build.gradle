@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
     alias(libs.plugins.spring.boot)
 }
 
@@ -8,6 +9,10 @@ version '1.0'
 
 repositories {
     mavenCentral()
+}
+
+application {
+    mainClass.set("bullish.store.StoreApplication")
 }
 
 dependencies {
