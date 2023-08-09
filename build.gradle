@@ -22,8 +22,12 @@ dependencies {
 
     runtimeOnly libs.h2
 
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
     // tests
     testImplementation testLibs.jupiter.api
+    testImplementation testLibs.spring.boot
     testRuntimeOnly testLibs.jupiter.engine
     testRuntimeOnly libs.h2
 }
