@@ -22,7 +22,7 @@ public class StockModelAssembler implements RepresentationModelAssembler<Stock, 
     @Nonnull
     public EntityModel<Stock> toModel(@Nonnull Stock stock) {
         return EntityModel.of(stock,
-                linkTo(methodOn(StockController.class).one(stock.getId())).withSelfRel(),
+//                linkTo(methodOn(StockController.class).one(stock.getId())).withSelfRel(),
                 linkTo(methodOn(ProductController.class).one(stock.getProductId())).withRel("product"),
                 linkTo(methodOn(StockController.class).all()).withRel("stock")
         );

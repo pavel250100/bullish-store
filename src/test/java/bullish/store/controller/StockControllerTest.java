@@ -52,7 +52,7 @@ class StockControllerTest {
 
     @Test
     void ShouldReturnStockById() throws Exception {
-        Stock stock = new Stock(1L, 2L, 10L);
+        Stock stock = new Stock();
         when(stockRepository.findById(1L)).thenReturn(Optional.of(stock));
         mockMvc.perform(get("/stock/1"))
                 .andExpect(status().isOk())
@@ -85,7 +85,7 @@ class StockControllerTest {
 
     @Test
     void ShouldAttachCorrectLinksToSingleStock() throws Exception {
-        Stock stock = new Stock(1L, 2L, 10L);
+        Stock stock = new Stock();
         when(stockRepository.findById(1L)).thenReturn(Optional.of(stock));
         mockMvc.perform(get("/stock/1"))
                 .andExpect(status().isOk())
@@ -97,8 +97,8 @@ class StockControllerTest {
 
     @Test
     void ShouldReturnStockByProductId() throws Exception {
-        Stock stock = new Stock(1L, 2L, 10L);
-        when(stockRepository.findByProductId(2L)).thenReturn(Optional.of(stock));
+        Stock stock = new Stock();
+//        when(stockRepository.findByProductId(2L)).thenReturn(Optional.of(stock));
         mockMvc.perform(get("/stock/product/2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(1)));
@@ -107,8 +107,8 @@ class StockControllerTest {
     @Test
     void ShouldReturnAllStocks() throws Exception {
         List<Stock> stocks = new ArrayList<>();
-        stocks.add(new Stock(1L, 1L, 10L));
-        stocks.add(new Stock(2L, 2L, 20L));
+        stocks.add(new Stock());
+        stocks.add(new Stock());
 
         when(stockRepository.findAll()).thenReturn(stocks);
 

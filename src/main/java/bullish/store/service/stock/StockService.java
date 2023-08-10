@@ -7,9 +7,7 @@ import java.util.List;
 public interface StockService {
 
     List<Stock> getAll();
-    Stock create(Long productId, Long quantity);
-    Stock update(Long productId, Long quantity);
-    Stock getById(Long id);
+    Stock update(Long productId, Stock newStock);
     Stock getByProductId(Long productId);
 
 }

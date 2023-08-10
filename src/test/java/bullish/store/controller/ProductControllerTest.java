@@ -60,7 +60,7 @@ class ProductControllerTest {
 
         @Bean
         public ProductService productService() {
-            return new ProductServiceImpl(productRepository, stockService);
+            return new ProductServiceImpl(productRepository);
         }
     }
 
@@ -171,7 +171,7 @@ class ProductControllerTest {
         savedProduct.setName(newProduct.getName());
         savedProduct.setPrice(newProduct.getPrice());
 
-        when(stockService.create(anyLong(), anyLong())).thenReturn(new Stock());
+//        when(stockService.create(anyLong(), anyLong())).thenReturn(new Stock());
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         mockMvc.perform(
@@ -183,6 +183,8 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.id", equalTo(1)))
                 .andExpect(jsonPath("$.name", equalTo("Product 1")))
                 .andExpect(jsonPath("$.price", equalTo(100)));
+
+//        verify(stockService, times(1)).create(1L, 0L);
     }
 
     @Test

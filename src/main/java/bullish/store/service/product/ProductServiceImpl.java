@@ -2,6 +2,7 @@ package bullish.store.service.product;
 
 import bullish.store.entity.Product;
 import bullish.store.entity.Stock;
+import bullish.store.exception.ProductHasBeenChangedException;
 import bullish.store.exception.ProductNotFoundException;
 import bullish.store.repository.ProductRepository;
 import bullish.store.service.stock.StockService;
@@ -14,12 +15,10 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final StockService stockService;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, StockService stockService) {
+    public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.stockService = stockService;
     }
 
     @Override
@@ -35,20 +34,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product create(Product newProduct) {
-        Product product = productRepository.save(newProduct);
-        stockService.create(product.getId(), 0L);
-        return product;
+        return productRepository.save(newProduct);
     }
 
     @Override
     public Product update(Long id, Product newProduct) {
-        return productRepository.findById(id)
-                .map(product -> {
-                    product.setName(newProduct.getName());
-                    product.setPrice(newProduct.getPrice());
-                    return productRepository.save(product);
-                })
-                .orElseThrow(() -> new ProductNotFoundException(id));
+        Product existingProduct = this.getById(id);
+        if (existingProduct.hashCode() != newProduct.hashCode()) {
+            throw new ProductHasBeenChangedException(id);
+        }
+        existingProduct.setPrice(newProduct.getPrice());
+        existingProduct.setDesc(newProduct.getDesc());
+        existingProduct.setName(newProduct.getName());
+        return productRepository.save(existingProduct);
     }
 
     @Override
