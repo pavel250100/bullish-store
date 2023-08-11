@@ -1,8 +1,8 @@
 package bullish.store.assembler;
 
+import bullish.store.communication.stock.Stock;
 import bullish.store.controller.ProductController;
 import bullish.store.controller.StockController;
-import bullish.store.entity.Stock;
 import jakarta.annotation.Nonnull;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -20,24 +20,23 @@ public class StockModelAssembler implements RepresentationModelAssembler<Stock, 
 
     @Override
     @Nonnull
-    public EntityModel<Stock> toModel(@Nonnull Stock stock) {
-        return EntityModel.of(stock,
-//                linkTo(methodOn(StockController.class).one(stock.getId())).withSelfRel(),
-                linkTo(methodOn(ProductController.class).one(stock.getProductId())).withRel("product"),
-                linkTo(methodOn(StockController.class).all()).withRel("stock")
+    public EntityModel<Stock> toModel(@Nonnull Stock entity) {
+        return EntityModel.of(entity,
+                linkTo(methodOn(StockController.class).getByProductId(entity.getProductId())).withSelfRel(),
+                linkTo(methodOn(ProductController.class).getById(entity.getProductId())).withRel("product"),
+                linkTo(methodOn(StockController.class).getAll()).withRel("stock")
         );
     }
 
     @Override
     @Nonnull
-    public CollectionModel<EntityModel<Stock>> toCollectionModel(@Nonnull Iterable<? extends Stock> stocks) {
-        List<EntityModel<Stock>> stockModels = StreamSupport.stream(stocks.spliterator(), false)
+    public CollectionModel<EntityModel<Stock>> toCollectionModel(@Nonnull Iterable<? extends Stock> entities) {
+        List<EntityModel<Stock>> stockModels = StreamSupport.stream(entities.spliterator(), false)
                 .map(this::toModel)
                 .toList();
 
         return CollectionModel.of(stockModels,
-                linkTo(methodOn(ProductController.class).all()).withSelfRel()
+                linkTo(methodOn(StockController.class).getAll()).withSelfRel()
         );
     }
-
 }

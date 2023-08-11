@@ -1,8 +1,8 @@
 package bullish.store.assembler;
 
+import bullish.store.communication.product.Product;
 import bullish.store.controller.ProductController;
 import bullish.store.controller.StockController;
-import bullish.store.entity.Product;
 import jakarta.annotation.Nonnull;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -24,8 +24,8 @@ public class ProductModelAssembler implements RepresentationModelAssembler<Produ
     @Nonnull
     public EntityModel<Product> toModel(@Nonnull Product product) {
         return EntityModel.of(product,
-            linkTo(methodOn(ProductController.class).one(product.getId())).withSelfRel(),
-            linkTo(methodOn(ProductController.class).all()).withRel("products"),
+            linkTo(methodOn(ProductController.class).getById(product.getId())).withSelfRel(),
+            linkTo(methodOn(ProductController.class).getAll()).withRel("products"),
             linkTo(methodOn(StockController.class).getByProductId(product.getId())).withRel("stock")
         );
     }
@@ -38,7 +38,7 @@ public class ProductModelAssembler implements RepresentationModelAssembler<Produ
             .toList();
 
         return CollectionModel.of(productModels,
-            linkTo(methodOn(ProductController.class).all()).withSelfRel()
+            linkTo(methodOn(ProductController.class).getAll()).withSelfRel()
         );
     }
 

@@ -1,25 +1,19 @@
 package bullish.store.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
-@AllArgsConstructor
-@Builder
 @Table(name = "product")
 @EntityListeners(AuditingEntityListener.class)
 @Entity(name = "product")
-public @Data class Product {
+public @Data class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,43 +28,34 @@ public @Data class Product {
     @LastModifiedDate
     private ZonedDateTime lastUpdatedAt;
 
+    @Version
+    private Long version;
+
     @OneToOne(
-            mappedBy = "product",
+            mappedBy = "productEntity",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Stock stock;
+    private StockEntity stockEntity;
 
-    @Builder
-    public Product(String name, String desc, BigDecimal price) {
+    @Builder(toBuilder = true)
+    public ProductEntity(String name, String desc, BigDecimal price) {
         this.name = name;
         this.desc = desc;
         this.price = price;
         createStock();
     }
 
-    @SuppressWarnings("unused")
-    // overriding builder construction in order to initialize Stock to 0
-    public static class ProductBuilder {
-        public Product build() {
-            Product product = new Product(name, desc, price);
-            product.setStock(new Stock());
-            product.getStock().setProduct(product);
-            product.getStock().setQuantity(0L);
-            return product;
-        }
-    }
-
-    public Product() {
+    public ProductEntity() {
         createStock();
     }
 
     private void createStock() {
-        this.stock = Stock.builder()
-                .quantity(0L)
-                .product(this)
-                .build();
+        StockEntity stockEntity = new StockEntity();
+        stockEntity.setProductEntity(this);
+        stockEntity.setQuantity(0L);
+        this.stockEntity = stockEntity;
     }
 
     @PrePersist
@@ -88,14 +73,11 @@ public @Data class Product {
         return "Product[" +
                 "id = '" + this.id + "', " +
                 "name = '" + this.name + "', " +
-                "price = '" + this.price + "'" +
-                "desc = '" + this.desc + "'" +
+                "price = '" + this.price + "', " +
+                "desc = '" + this.desc + "', " +
                 "createdAt = '" + this.createdAt + "', " +
+                "lastUpdatedAt = '" + this.lastUpdatedAt + "', " +
+                "version = '" + this.version + "'" +
                 "]";
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, desc, price);
     }
 }

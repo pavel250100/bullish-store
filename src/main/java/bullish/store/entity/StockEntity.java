@@ -1,23 +1,18 @@
 package bullish.store.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Table(name = "stock")
 @EntityListeners(AuditingEntityListener.class)
 @Entity(name = "stock")
-public @Data class Stock {
+public @Data class StockEntity {
 
     @Id
     private Long productId;
@@ -26,10 +21,13 @@ public @Data class Stock {
     @LastModifiedDate
     private ZonedDateTime lastUpdatedAt;
 
+    @Version
+    private Long version;
+
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    private Product product;
+    private ProductEntity productEntity;
 
     @PrePersist
     protected void onCreate() {
@@ -45,12 +43,9 @@ public @Data class Stock {
     public String toString() {
         return "Stock[" +
                 "productId = '" + this.productId + "', " +
-                "quantity = '" + this.quantity + "'" +
+                "quantity = '" + this.quantity + "', " +
+                "lastUpdatedAt = '" + this.lastUpdatedAt + "', " +
+                "version = '" + this.version + "'" +
                 "]";
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(quantity);
     }
 }

@@ -1,8 +1,12 @@
 package bullish.store.controller;
 
 import bullish.store.assembler.ProductModelAssembler;
-import bullish.store.exception.ProductNotFoundException;
-import bullish.store.entity.Product;
+import bullish.store.communication.product.Product;
+import bullish.store.communication.product.ProductCreateRequest;
+import bullish.store.communication.product.ProductUpdateRequest;
+import bullish.store.entity.ProductEntity;
+import bullish.store.exception.product.ProductConflictException;
+import bullish.store.exception.product.ProductNotFoundException;
 import bullish.store.service.product.ProductService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -23,34 +27,38 @@ public class ProductController {
     }
 
     @GetMapping
-    public CollectionModel<EntityModel<Product>> all() {
-        List<Product> products = productService.getAll();
-        return assembler.toCollectionModel(products);
+    public CollectionModel<EntityModel<Product>> getAll() {
+        List<ProductEntity> productEntities = productService.getAll();
+        List<Product> dtos = Product.toDtoList(productEntities);
+        return assembler.toCollectionModel(dtos);
     }
 
     @GetMapping("/{id}")
-    public EntityModel<Product> one(@PathVariable Long id) throws ProductNotFoundException {
-        Product product = productService.getById(id);
-        return assembler.toModel(product);
+    public EntityModel<Product> getById(@PathVariable Long id) throws ProductNotFoundException {
+        ProductEntity productEntity = productService.getById(id);
+        Product dto = Product.toDto(productEntity);
+        return assembler.toModel(dto);
     }
 
     @PostMapping
-    ResponseEntity<?> create(@RequestBody Product newProduct) {
-        Product savedProduct = productService.create(newProduct);
-        return assembler.toCreated(savedProduct);
+    public ResponseEntity<?> create(@RequestBody ProductCreateRequest request) {
+        ProductEntity savedProductEntity = productService.create(request);
+        Product dto = Product.toDto(savedProductEntity);
+        return assembler.toCreated(dto);
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> update(
+    public EntityModel<Product> update(
             @PathVariable Long id,
-            @RequestBody Product newProduct
-    ) {
-        Product updatedProduct = productService.update(id, newProduct);
-        return assembler.toCreated(updatedProduct);
+            @RequestBody ProductUpdateRequest request
+    ) throws ProductNotFoundException, ProductConflictException {
+        ProductEntity updatedProductEntity = productService.update(id, request);
+        Product dto = Product.toDto(updatedProductEntity);
+        return assembler.toModel(dto);
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteById(@PathVariable Long id) {
+    public ResponseEntity<?> deleteById(@PathVariable Long id) {
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

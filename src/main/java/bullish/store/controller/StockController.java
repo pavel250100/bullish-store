@@ -1,9 +1,11 @@
 package bullish.store.controller;
 
 import bullish.store.assembler.StockModelAssembler;
-import bullish.store.communication.stock.StockDTO;
-import bullish.store.entity.Stock;
-import bullish.store.exception.StockNotFoundException;
+import bullish.store.communication.stock.Stock;
+import bullish.store.communication.stock.StockUpdateRequest;
+import bullish.store.entity.StockEntity;
+import bullish.store.exception.stock.StockConflictException;
+import bullish.store.exception.stock.StockNotFoundException;
 import bullish.store.service.stock.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -26,28 +28,27 @@ public class StockController {
     }
 
     @GetMapping
-    public CollectionModel<EntityModel<Stock>> all() {
-        List<Stock> stocks = stockService.getAll();
-        return stockModelAssembler.toCollectionModel(stocks);
+    public CollectionModel<EntityModel<Stock>> getAll() {
+        List<StockEntity> stockEntities = stockService.getAll();
+        List<Stock> dtos = Stock.toDtoList(stockEntities);
+        return stockModelAssembler.toCollectionModel(dtos);
     }
 
-    @GetMapping("/{id}")
-    public EntityModel<Stock> getById(@PathVariable Long id) throws StockNotFoundException {
-//        Stock stock = stockService.getById(id);
-//        return stockModelAssembler.toModel(stock);
-        return null;
-    }
-
-    @GetMapping("/product/{productId}")
+    @GetMapping("/{productId}")
     public EntityModel<Stock> getByProductId(@PathVariable Long productId) throws StockNotFoundException {
-        Stock stock = stockService.getByProductId(productId);
-        return stockModelAssembler.toModel(stock);
+        StockEntity stockEntity = stockService.getByProductId(productId);
+        Stock dto = Stock.toDto(stockEntity);
+        return stockModelAssembler.toModel(dto);
     }
 
-    @PutMapping("/{id}")
-    public EntityModel<StockDTO> update(@PathVariable Long productId) throws StockNotFoundException {
-        return null;
-//        Stock stock = stockService.update(productId, quantity);
+    @PutMapping("/{productId}")
+    public EntityModel<Stock> update(
+            @PathVariable Long productId,
+            @RequestBody StockUpdateRequest request
+    ) throws StockConflictException, StockNotFoundException {
+        StockEntity stockEntity = stockService.update(productId, request);
+        Stock dto = Stock.toDto(stockEntity);
+        return stockModelAssembler.toModel(dto);
     }
 
 }

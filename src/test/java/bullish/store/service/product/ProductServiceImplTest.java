@@ -1,16 +1,20 @@
 package bullish.store.service.product;
 
-import bullish.store.entity.Product;
-import bullish.store.exception.ProductHasBeenChangedException;
-import bullish.store.exception.ProductNotFoundException;
+import bullish.store.communication.product.ProductCreateRequest;
+import bullish.store.communication.product.ProductUpdateRequest;
+import bullish.store.entity.ProductEntity;
+import bullish.store.exception.product.ProductConflictException;
+import bullish.store.exception.product.ProductNotFoundException;
 import bullish.store.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -19,94 +23,89 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
 
-    @MockBean
+    @Mock
     private ProductRepository productRepository;
 
-    @Autowired
+    @InjectMocks
     private ProductServiceImpl productService;
 
-    @Test
-    public void ShouldReturnProductById() {
-        Long productId = 1L;
-        Product product = new Product();
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-
-        Product result = productService.getById(productId);
-
-        assertEquals(product, result);
+    ProductEntity dummyProduct(Long id, String name, String desc, BigDecimal price, Long version) {
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setName(name);
+        productEntity.setDesc(desc);
+        productEntity.setPrice(price);
+        productEntity.setId(id);
+        productEntity.setVersion(version);
+        return productEntity;
     }
 
     @Test
-    public void ShouldThrowProductNotFoundExceptionOnGetById() {
-        Long productId = 1L;
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+    public void ShouldReturnSingleProduct() {
+        ProductEntity expectedProductEntity = dummyProduct(1L, "Product 1", "Desc 1", BigDecimal.valueOf(100), 1L);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(expectedProductEntity));
 
-        Exception exception = assertThrows(ProductNotFoundException.class, () -> productService.getById(productId));
-
-        String expectedMessage = "Could not find product 1";
-        String actualMessage = exception.getMessage();
-        assertEquals(actualMessage, expectedMessage);
+        ProductEntity actualProductEntity = productService.getById(1L);
+        assertEquals(expectedProductEntity, actualProductEntity);
+        verify(productRepository).findById(1L);
     }
 
     @Test
-    public void ShouldReturnAllProducts() {
-        Product product1 = new Product();
-        Product product2 = new Product();
-        when(productRepository.findAll()).thenReturn(Arrays.asList(product1, product2));
-
-        List<Product> result = productService.getAll();
-
-        assertEquals(2, result.size());
+    public void ShouldThrowProductNotFoundException_OnFindById() {
+        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(ProductNotFoundException.class, () -> productService.getById(1L));
+        verify(productRepository).findById(1L);
     }
 
     @Test
-    public void ShouldCreateNewProductAndReturnCreatedProduct() {
-        Product newProduct = new Product();
-        when(productRepository.save(newProduct)).thenReturn(newProduct);
-
-        Product result = productService.create(newProduct);
-
-        assertEquals(newProduct, result);
+    public void ShouldReturnProductList() {
+        List<ProductEntity> expectedProductEntities = Arrays.asList(
+                dummyProduct(1L, "Product 1", "Desc 1", BigDecimal.valueOf(100), 1L),
+                dummyProduct(2L, "Product 2", "Desc 2", BigDecimal.valueOf(200), 1L)
+        );
+        when(productRepository.findAll()).thenReturn(expectedProductEntities);
+        List<ProductEntity> actualProductEntities = productService.getAll();
+        assertEquals(expectedProductEntities, actualProductEntities);
+        verify(productRepository).findAll();
     }
 
     @Test
-    public void ShouldUpdateProductWithNoConflict() {
-        Long productId = 1L;
-        Product existingProduct = new Product();
-        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
-
-        Product newProduct = new Product();
-
-        productService.update(productId, newProduct);
-
-        verify(productRepository).save(existingProduct);
+    public void ShouldReturnCreatedProduct() {
+        ProductCreateRequest request = new ProductCreateRequest("Product 1", "Desc 1", BigDecimal.valueOf(100), 1L);
+        ProductEntity expectedProductEntity = dummyProduct(1L, "Product 1", "Desc 1", BigDecimal.valueOf(100), 1L);
+        when(productRepository.save(any())).thenReturn(expectedProductEntity);
+        ProductEntity actualProductEntity = productService.create(request);
+        assertEquals(expectedProductEntity, actualProductEntity);
     }
 
     @Test
-    public void ShouldThrowProductHasBeenChangedExceptionOnUpdate() {
-        Long productId = 1L;
-        Product existingProduct = new Product();
-        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+    public void ShouldReturnUpdatedProduct() {
+        ProductUpdateRequest request = new ProductUpdateRequest("New Product 1", "New Desc 1", BigDecimal.valueOf(150), 1L);
+        ProductEntity existingProductEntity = dummyProduct(1L, "Product 1", "Desc 1", BigDecimal.valueOf(100), 1L);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(existingProductEntity));
+        when(productRepository.save(any())).thenReturn(existingProductEntity);
 
-        Product newProduct = new Product();
-        newProduct.setName("New Name");
+        ProductEntity actualProductEntity = productService.update(1L, request);
 
-        Exception exception = assertThrows(ProductHasBeenChangedException.class, () -> productService.update(productId, newProduct));
-        String expectedMessage = "Product 1 has been changed";
-        String actualMessage = exception.getMessage();
-        assertEquals(actualMessage, expectedMessage);
+        assertEquals(existingProductEntity, actualProductEntity);
     }
 
     @Test
-    public void testDeleteById() {
-        Long productId = 1L;
+    public void ShouldThrowProductConflictException_WhenUpdatingProduct() {
+        ProductUpdateRequest request = new ProductUpdateRequest("New Product 1", "New Desc 1", BigDecimal.valueOf(150), 1L);
+        ProductEntity existingProductEntity = dummyProduct(1L, "Product 1", "Desc 1", BigDecimal.valueOf(100), 2L);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(existingProductEntity));
 
-        productService.deleteById(productId);
+        assertThrows(ProductConflictException.class, () -> productService.update(1L, request));
+        verify(productRepository).findById(1L);
+    }
 
-        verify(productRepository).deleteById(productId);
+    @Test
+    public void ShouldCallDeleteById() {
+        productService.deleteById(1L);
+        verify(productRepository).deleteById(1L);
     }
 
 

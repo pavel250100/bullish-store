@@ -1,13 +1,14 @@
 package bullish.store.service.product;
 
-import bullish.store.entity.Product;
-import bullish.store.entity.Stock;
-import bullish.store.exception.ProductHasBeenChangedException;
-import bullish.store.exception.ProductNotFoundException;
+import bullish.store.communication.product.ProductCreateRequest;
+import bullish.store.communication.product.ProductUpdateRequest;
+import bullish.store.entity.ProductEntity;
+import bullish.store.exception.product.ProductConflictException;
+import bullish.store.exception.product.ProductNotFoundException;
 import bullish.store.repository.ProductRepository;
-import bullish.store.service.stock.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,34 +22,46 @@ public class ProductServiceImpl implements ProductService {
         this.productRepository = productRepository;
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public Product getById(Long id) throws ProductNotFoundException {
+    public ProductEntity getById(Long id) throws ProductNotFoundException {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<Product> getAll() {
+    public List<ProductEntity> getAll() {
         return productRepository.findAll();
     }
 
+    @Transactional
     @Override
-    public Product create(Product newProduct) {
-        return productRepository.save(newProduct);
+    public ProductEntity create(ProductCreateRequest request) {
+        ProductEntity productEntity = ProductEntity.builder()
+                .name(request.getName())
+                .desc(request.getDesc())
+                .price(request.getPrice())
+                .build();
+        return productRepository.save(productEntity);
     }
 
+    @Transactional
     @Override
-    public Product update(Long id, Product newProduct) {
-        Product existingProduct = this.getById(id);
-        if (existingProduct.hashCode() != newProduct.hashCode()) {
-            throw new ProductHasBeenChangedException(id);
+    public ProductEntity update(Long id, ProductUpdateRequest request) {
+        ProductEntity existingProductEntity = this.getById(id);
+        if (!existingProductEntity.getVersion().equals(request.getVersion())) {
+            throw new ProductConflictException(existingProductEntity);
         }
-        existingProduct.setPrice(newProduct.getPrice());
-        existingProduct.setDesc(newProduct.getDesc());
-        existingProduct.setName(newProduct.getName());
-        return productRepository.save(existingProduct);
+        existingProductEntity.toBuilder()
+                .price(request.getPrice())
+                .name(request.getName())
+                .desc(request.getDesc())
+                .build();
+        return productRepository.save(existingProductEntity);
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
         productRepository.deleteById(id);

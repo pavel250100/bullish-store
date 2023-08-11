@@ -1,16 +1,18 @@
 package bullish.store.service.product;
 
-import bullish.store.entity.Product;
-import bullish.store.exception.ProductNotFoundException;
+import bullish.store.communication.product.ProductCreateRequest;
+import bullish.store.communication.product.ProductUpdateRequest;
+import bullish.store.entity.ProductEntity;
+import bullish.store.exception.product.ProductNotFoundException;
 
 import java.util.List;
 
 public interface ProductService {
 
-        Product getById(Long id) throws ProductNotFoundException;
-        List<Product> getAll();
-        Product create(Product newProduct);
-        Product update(Long id, Product newProduct);
+        ProductEntity getById(Long id) throws ProductNotFoundException;
+        List<ProductEntity> getAll();
+        ProductEntity create(ProductCreateRequest request);
+        ProductEntity update(Long id, ProductUpdateRequest request);
         void deleteById(Long id);
 
 }

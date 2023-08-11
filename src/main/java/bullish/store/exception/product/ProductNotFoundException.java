@@ -1,4 +1,4 @@
-package bullish.store.exception;
+package bullish.store.exception.product;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;

@@ -1,4 +1,4 @@
-package bullish.store.exception;
+package bullish.store.exception.stock;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -6,18 +6,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class StockHasBeenChangedException extends RuntimeException {
+public class StockNotFoundException extends RuntimeException {
 
-    public StockHasBeenChangedException(Long productId) {
-        super("Stock for product " + productId + " has been changed");
+    public StockNotFoundException(Long productId) {
+        super("Could not find stock for product id " + productId);
     }
 
     @ControllerAdvice
     public static class Advice {
         @ResponseBody
-        @ExceptionHandler({StockHasBeenChangedException.class})
-        @ResponseStatus(HttpStatus.CONFLICT)
-        String productNotFoundHandler(StockHasBeenChangedException ex) {
+        @ExceptionHandler({StockNotFoundException.class})
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        String productNotFoundHandler(StockNotFoundException ex) {
             return ex.getMessage();
         }
     }

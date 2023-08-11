@@ -1,11 +1,13 @@
 package bullish.store.service.stock;
 
-import bullish.store.entity.Stock;
-import bullish.store.exception.StockHasBeenChangedException;
-import bullish.store.exception.StockNotFoundException;
+import bullish.store.communication.stock.StockUpdateRequest;
+import bullish.store.entity.StockEntity;
+import bullish.store.exception.stock.StockConflictException;
+import bullish.store.exception.stock.StockNotFoundException;
 import bullish.store.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,23 +21,26 @@ public class StockServiceImpl implements StockService {
         this.stockRepository = stockRepository;
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<Stock> getAll() {
+    public List<StockEntity> getAll() {
         return stockRepository.findAll();
     }
 
+    @Transactional
     @Override
-    public Stock update(Long productId, Stock newStock) {
-        Stock existingStock = this.getByProductId(productId);
-        if (existingStock.hashCode() != newStock.hashCode()) {
-            throw new StockHasBeenChangedException(productId);
+    public StockEntity update(Long productId, StockUpdateRequest request) {
+        StockEntity existingStockEntity = this.getByProductId(productId);
+        if (!existingStockEntity.getVersion().equals(request.getVersion())) {
+            throw new StockConflictException(existingStockEntity);
         }
-        existingStock.setQuantity(newStock.getQuantity());
-        return stockRepository.save(existingStock);
+        existingStockEntity.setQuantity(request.getQuantity());
+        return stockRepository.save(existingStockEntity);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public Stock getByProductId(Long productId) {
+    public StockEntity getByProductId(Long productId) {
         return stockRepository.findById(productId)
                 .orElseThrow(() -> new StockNotFoundException(productId));
     }

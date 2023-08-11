@@ -1,10 +1,13 @@
 package bullish.store.controller;
 
+import bullish.store.assembler.ProductModelAssembler;
 import bullish.store.assembler.StockModelAssembler;
-import bullish.store.entity.Stock;
-import bullish.store.repository.StockRepository;
-import bullish.store.service.stock.StockServiceImpl;
+import bullish.store.communication.stock.StockUpdateRequest;
+import bullish.store.entity.StockEntity;
+import bullish.store.exception.stock.StockConflictException;
+import bullish.store.exception.stock.StockNotFoundException;
 import bullish.store.service.stock.StockService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,108 +17,133 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(StockController.class)
 class StockControllerTest {
 
+    @MockBean
+    private StockService stockService;
+
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private StockRepository stockRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @TestConfiguration
     static class ProductControllerTestContextConfiguration {
-
-        @Autowired
-        private StockRepository stockRepository;
-
         @Bean
-        public StockModelAssembler stockModelAssembler() {
-            return new StockModelAssembler();
-        }
-
+        public StockModelAssembler stockModelAssembler() { return new StockModelAssembler(); }
         @Bean
-        public StockService stockService() {
-            return new StockServiceImpl(stockRepository);
-        }
+        public ProductModelAssembler productModelAssembler() { return new ProductModelAssembler(); }
+    }
+
+    private StockEntity dummyStock() {
+        StockEntity stock = new StockEntity();
+        stock.setProductId(1L);
+        stock.setVersion(1L);
+        stock.setQuantity(10L);
+        return stock;
     }
 
     @Test
-    void ShouldReturnStockById() throws Exception {
-        Stock stock = new Stock();
-        when(stockRepository.findById(1L)).thenReturn(Optional.of(stock));
-        mockMvc.perform(get("/stock/1"))
+    void ShouldReturnStatusOkAndStock_OnGetByProductId() throws Exception {
+        Long productId = 1L;
+        StockEntity stock = dummyStock();
+        when(stockService.getByProductId(productId)).thenReturn(stock);
+        mockMvc.perform(get("/stock/{productId}", productId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", equalTo(1)))
-                .andExpect(jsonPath("$.productId", equalTo(2)))
-                .andExpect(jsonPath("$.quantity", equalTo(10)));
+                .andExpect(content().contentType("application/hal+json"))
+                .andExpect(jsonPath("$.productId", equalTo(1)))
+                .andExpect(jsonPath("$.quantity", equalTo(10)))
+                .andExpect(jsonPath("$.version", equalTo(1)));
     }
 
     @Test
-    void OnGetStockByProductId_ShouldHandleStockNotFoundByProductId_And_ReturnNotFoundMessage() throws Exception {
+    void ShouldReturnEntireStock_OnGetAll() throws Exception {
+        StockEntity stock1 = dummyStock();
+        stock1.setProductId(1L);
+        StockEntity stock2 = dummyStock();
+        stock2.setProductId(2L);
+        List<StockEntity> stocks = Arrays.asList(stock1, stock2);
+        when(stockService.getAll()).thenReturn(stocks);
+
+        mockMvc.perform(get("/stock")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/hal+json"))
+                .andExpect(jsonPath("$._embedded.stockList", hasSize(2)))
+                .andExpect(jsonPath("$._embedded.stockList[0].productId", equalTo(1)))
+                .andExpect(jsonPath("$._embedded.stockList[0].quantity", equalTo(10)))
+                .andExpect(jsonPath("$._embedded.stockList[0].version", equalTo(1)))
+                .andExpect(jsonPath("$._embedded.stockList[1].productId", equalTo(2)))
+                .andExpect(jsonPath("$._embedded.stockList[1].quantity", equalTo(10)))
+                .andExpect(jsonPath("$._embedded.stockList[1].version", equalTo(1)));
+    }
+
+    @Test
+    void ShouldReturnStatusNotFoundAndExceptionMessage_OnGetByProductId() throws Exception {
         Long nonExistentProductId = 1L;
-        when(stockRepository.findById(nonExistentProductId)).thenReturn(Optional.empty());
-        mockMvc.perform(
-                        get("/stock/product/{id}", nonExistentProductId)
-                                .contentType(MediaType.APPLICATION_JSON))
+        when(stockService.getByProductId(nonExistentProductId)).thenThrow(new StockNotFoundException(nonExistentProductId));
+        mockMvc.perform(get("/stock/{id}", nonExistentProductId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Could not find stock for product id " + nonExistentProductId));
     }
 
     @Test
-    void OnGetStockById_ShouldHandleStockNotFoundById_And_ReturnNotFoundMessage() throws Exception {
-        Long nonExistentStockId = 1L;
-        when(stockRepository.findById(nonExistentStockId)).thenReturn(Optional.empty());
-        mockMvc.perform(
-                        get("/stock/{id}", nonExistentStockId)
-                                .contentType(MediaType.APPLICATION_JSON))
+    void ShouldReturnUpdatedStockAndStatusOk_OnUpdate() throws Exception {
+        StockUpdateRequest request = new StockUpdateRequest(10L, 1L);
+        Long productId = 1L;
+        when(stockService.update(productId, request)).thenReturn(dummyStock());
+        mockMvc.perform(put("/stock/{productId}", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/hal+json"))
+                .andExpect(jsonPath("$.productId", equalTo(1)))
+                .andExpect(jsonPath("$.quantity", equalTo(10)))
+                .andExpect(jsonPath("$.version", equalTo(1)));
+    }
+
+    @Test
+    void ShouldReturnStatusNotFoundAndExceptionMessage_OnUpdate() throws Exception {
+        StockUpdateRequest request = new StockUpdateRequest(10L, 1L);
+        Long nonExistentProductId = 1L;
+        when(stockService.update(nonExistentProductId, request)).thenThrow(new StockNotFoundException(nonExistentProductId));
+        mockMvc.perform(put("/stock/{productId}", nonExistentProductId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Could not find stock " + nonExistentStockId));
+                .andExpect(content().string("Could not find stock for product id " + nonExistentProductId));
     }
 
     @Test
-    void ShouldAttachCorrectLinksToSingleStock() throws Exception {
-        Stock stock = new Stock();
-        when(stockRepository.findById(1L)).thenReturn(Optional.of(stock));
-        mockMvc.perform(get("/stock/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._links.self.href", equalTo("http://localhost/stock/1")))
-                .andExpect(jsonPath("$._links.product.href", equalTo("http://localhost/products/2")))
-                .andExpect(jsonPath("$._links.stock.href", equalTo("http://localhost/stock")))
-                .andExpect(jsonPath("$._links.*", hasSize(3)));
+    void ShouldReturnStatusConflictAndLatestStock_OnUpdate() throws Exception {
+        StockEntity latestStock = dummyStock();
+        latestStock.setVersion(2L);
+        latestStock.setQuantity(20L);
+        StockUpdateRequest request = new StockUpdateRequest(10L, 1L);
+        Long productId = 1L;
+        when(stockService.update(productId, request)).thenThrow(new StockConflictException(latestStock));
+        mockMvc.perform(put("/stock/{productId}", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict())
+                .andExpect(content().contentType("application/hal+json"))
+                .andExpect(jsonPath("$.productId", equalTo(1)))
+                .andExpect(jsonPath("$.quantity", equalTo(20)))
+                .andExpect(jsonPath("$.version", equalTo(2)));
     }
 
-    @Test
-    void ShouldReturnStockByProductId() throws Exception {
-        Stock stock = new Stock();
-//        when(stockRepository.findByProductId(2L)).thenReturn(Optional.of(stock));
-        mockMvc.perform(get("/stock/product/2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", equalTo(1)));
-    }
-
-    @Test
-    void ShouldReturnAllStocks() throws Exception {
-        List<Stock> stocks = new ArrayList<>();
-        stocks.add(new Stock());
-        stocks.add(new Stock());
-
-        when(stockRepository.findAll()).thenReturn(stocks);
-
-        mockMvc.perform(get("/stock"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.stockList", hasSize(2)))
-                .andExpect(jsonPath("$._embedded.stockList[0].id", equalTo(1)))
-                .andExpect(jsonPath("$._embedded.stockList[1].id", equalTo(2)));
-    }
 }
