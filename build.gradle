@@ -21,6 +21,7 @@ dependencies {
     implementation libs.logback
     implementation libs.bundles.spring
     implementation libs.bundles.jwt
+    testImplementation 'junit:junit:4.13.1'
 
     runtimeOnly libs.h2
 
@@ -30,6 +31,7 @@ dependencies {
     // tests
     testImplementation testLibs.jupiter.api
     testImplementation testLibs.bundles.spring.test
+    testImplementation testLibs.mockito.inline
     testRuntimeOnly testLibs.jupiter.engine
     testRuntimeOnly libs.h2
 }

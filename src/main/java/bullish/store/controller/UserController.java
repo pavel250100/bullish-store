@@ -4,7 +4,7 @@ import bullish.store.assembler.UserModelAssembler;
 import bullish.store.communication.user.User;
 import bullish.store.entity.UserEntity;
 import bullish.store.service.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,16 +17,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final UserModelAssembler assembler;
-
-    @Autowired
-    public UserController(UserService userService, UserModelAssembler assembler) {
-        this.userService = userService;
-        this.assembler = assembler;
-    }
 
     @GetMapping("/{username}")
     @PreAuthorize("#username == authentication.principal.username or hasRole('ADMIN')")

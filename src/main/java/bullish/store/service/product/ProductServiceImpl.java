@@ -6,21 +6,17 @@ import bullish.store.entity.ProductEntity;
 import bullish.store.exception.product.ProductConflictException;
 import bullish.store.exception.product.ProductNotFoundException;
 import bullish.store.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-
-    @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
 
     @Transactional(readOnly = true)
     @Override

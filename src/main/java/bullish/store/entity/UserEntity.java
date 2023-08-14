@@ -3,7 +3,9 @@ package bullish.store.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity(name = "user")
@@ -11,7 +13,7 @@ import java.util.Set;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"roles", "details"})
+@EqualsAndHashCode(exclude = {"roles", "details", "cart", "orders"})
 public @Data class UserEntity {
 
     @Id
@@ -36,8 +38,24 @@ public @Data class UserEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-
     private Set<UserRoleEntity> roles = new HashSet<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private CartEntity cart;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderEntity> orders = new ArrayList<>();
+
+    @PrePersist
+    private void initializeCart() {
+        if (this.cart == null) {
+            CartEntity cart = CartEntity.builder()
+                    .user(this)
+                    .build();
+            this.cart = cart;
+        }
+    }
 
     @Override
     public String toString() {

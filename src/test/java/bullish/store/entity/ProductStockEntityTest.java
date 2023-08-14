@@ -54,7 +54,7 @@ class ProductStockEntityTest {
 
         assertNotNull(savedProductEntity.getCreatedAt());
         assertEquals(savedProductEntity.getVersion(), 0L);
-        assertEquals(savedProductEntity.getStockEntity().getVersion(), 0L);
+        assertEquals(savedProductEntity.getStock().getVersion(), 0L);
 
         newProductEntity.setPrice(new BigDecimal("79.99"));
         ZonedDateTime initialLastUpdatedAt = newProductEntity.getLastUpdatedAt();
@@ -63,7 +63,7 @@ class ProductStockEntityTest {
         assertNotNull(updatedProductEntity.getLastUpdatedAt());
         assertTrue(updatedProductEntity.getLastUpdatedAt().isAfter(initialLastUpdatedAt));
         assertEquals(updatedProductEntity.getVersion(), 1L);
-        assertEquals(savedProductEntity.getStockEntity().getVersion(), 0L);
+        assertEquals(savedProductEntity.getStock().getVersion(), 0L);
     }
 
     @Test

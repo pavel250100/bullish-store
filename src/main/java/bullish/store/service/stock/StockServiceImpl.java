@@ -5,21 +5,17 @@ import bullish.store.entity.StockEntity;
 import bullish.store.exception.stock.StockConflictException;
 import bullish.store.exception.stock.StockNotFoundException;
 import bullish.store.repository.StockRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class StockServiceImpl implements StockService {
 
     private final StockRepository stockRepository;
-
-    @Autowired
-    public StockServiceImpl(StockRepository stockRepository) {
-        this.stockRepository = stockRepository;
-    }
 
     @Transactional(readOnly = true)
     @Override

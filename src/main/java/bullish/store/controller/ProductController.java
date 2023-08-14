@@ -8,6 +8,7 @@ import bullish.store.entity.ProductEntity;
 import bullish.store.exception.product.ProductConflictException;
 import bullish.store.exception.product.ProductNotFoundException;
 import bullish.store.service.product.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +19,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
+
     private final ProductService productService;
     private final ProductModelAssembler assembler;
-
-    ProductController(ProductService productService, ProductModelAssembler assembler) {
-        this.productService = productService;
-        this.assembler = assembler;
-    }
 
     @GetMapping
     public CollectionModel<EntityModel<Product>> getAll() {

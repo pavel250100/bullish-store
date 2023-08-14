@@ -7,7 +7,7 @@ import bullish.store.entity.StockEntity;
 import bullish.store.exception.stock.StockConflictException;
 import bullish.store.exception.stock.StockNotFoundException;
 import bullish.store.service.stock.StockService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,16 +17,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/stock")
+@RequiredArgsConstructor
 public class StockController {
 
     private final StockService stockService;
     private final StockModelAssembler stockModelAssembler;
-
-    @Autowired
-    public StockController(StockService stockService, StockModelAssembler stockModelAssembler) {
-        this.stockService = stockService;
-        this.stockModelAssembler = stockModelAssembler;
-    }
 
     @GetMapping
     public CollectionModel<EntityModel<Stock>> getAll() {

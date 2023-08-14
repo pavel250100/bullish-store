@@ -76,4 +76,29 @@ class UserEntityTest {
         assertNull(retrievedDetails);
     }
 
+    @Test
+    public void ShouldInitializeUser_AndAnEmptyCart() {
+        UserRoleEntity userRole = UserRoleEntity.builder()
+                .role(UserRoleEntity.Role.ADMIN)
+                .build();
+
+        UserDetailsEntity userDetails = UserDetailsEntity.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@gmail.com")
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .details(userDetails)
+                .roles(Set.of(userRole))
+                .build();
+
+        UserEntity savedUser = entityManager.persistAndFlush(user);
+
+        CartEntity savedCart = entityManager.find(CartEntity.class, savedUser.getId());
+
+        assertNotNull(savedCart);
+        assertEquals(savedCart.getItems().size(), 0);
+    }
+
 }

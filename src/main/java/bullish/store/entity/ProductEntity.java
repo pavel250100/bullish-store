@@ -37,7 +37,7 @@ public @Data class ProductEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private StockEntity stockEntity;
+    private StockEntity stock;
 
     @Builder(toBuilder = true)
     public ProductEntity(String name, String desc, BigDecimal price) {
@@ -55,7 +55,7 @@ public @Data class ProductEntity {
         StockEntity stockEntity = new StockEntity();
         stockEntity.setProductEntity(this);
         stockEntity.setQuantity(0L);
-        this.stockEntity = stockEntity;
+        this.stock = stockEntity;
     }
 
     @PrePersist
