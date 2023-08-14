@@ -2,6 +2,7 @@ rootProject.name = 'bullish-store'
 
 // central place for all dependencies which are shared with the same version between modules
 def springVersion = "3.1.2"
+def jwtVersion = "0.11.5"
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -15,7 +16,14 @@ dependencyResolutionManagement {
             library("spring.web", "org.springframework.boot", "spring-boot-starter-web").version(springVersion)
             library("spring.data.jpa", "org.springframework.boot", "spring-boot-starter-data-jpa").version(springVersion)
             library("spring.hateoas", "org.springframework.boot", "spring-boot-starter-hateoas").version(springVersion)
-            bundle("spring", ["spring.web", "spring.data.jpa", "spring.hateoas"])
+            library("spring.security", "org.springframework.boot", "spring-boot-starter-security").version(springVersion)
+            bundle("spring", ["spring.web", "spring.data.jpa", "spring.hateoas", "spring.security"])
+
+            // jwt
+            library("jwt.impl", "io.jsonwebtoken", "jjwt-impl").version(jwtVersion)
+            library("jwt.api", "io.jsonwebtoken", "jjwt-api").version(jwtVersion)
+            library("jwt.jackson", "io.jsonwebtoken", "jjwt-jackson").version(jwtVersion)
+            bundle("jwt", ["jwt.impl", "jwt.api", "jwt.jackson"])
 
             // database
             library("h2", "com.h2database", "h2").version("2.2.220")
@@ -28,7 +36,10 @@ dependencyResolutionManagement {
             library("jupiter.api", "org.junit.jupiter", "junit-jupiter-api").versionRef(junitVersion)
             library("jupiter.engine", "org.junit.jupiter", "junit-jupiter-engine").versionRef(junitVersion)
 
+            // spring test
+            library("spring.security.test", "org.springframework.security", "spring-security-test").version("6.1.2")
             library("spring.boot", "org.springframework.boot", "spring-boot-starter-test").version(springVersion)
+            bundle("spring.test", ["spring.security.test", "spring.boot"])
         }
     }
 }

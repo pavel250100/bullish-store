@@ -20,6 +20,7 @@ dependencies {
     implementation libs.log4j.slf4j
     implementation libs.logback
     implementation libs.bundles.spring
+    implementation libs.bundles.jwt
 
     runtimeOnly libs.h2
 
@@ -28,7 +29,7 @@ dependencies {
 
     // tests
     testImplementation testLibs.jupiter.api
-    testImplementation testLibs.spring.boot
+    testImplementation testLibs.bundles.spring.test
     testRuntimeOnly testLibs.jupiter.engine
     testRuntimeOnly libs.h2
 }

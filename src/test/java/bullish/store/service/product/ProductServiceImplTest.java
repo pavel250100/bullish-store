@@ -73,7 +73,7 @@ class ProductServiceImplTest {
 
     @Test
     public void ShouldReturnCreatedProduct() {
-        ProductCreateRequest request = new ProductCreateRequest("Product 1", "Desc 1", BigDecimal.valueOf(100), 1L);
+        ProductCreateRequest request = new ProductCreateRequest("Product 1", "Desc 1", BigDecimal.valueOf(100));
         ProductEntity expectedProductEntity = dummyProduct(1L, "Product 1", "Desc 1", BigDecimal.valueOf(100), 1L);
         when(productRepository.save(any())).thenReturn(expectedProductEntity);
         ProductEntity actualProductEntity = productService.create(request);

@@ -4,6 +4,8 @@ import bullish.store.assembler.ProductModelAssembler;
 import bullish.store.assembler.StockModelAssembler;
 import bullish.store.communication.product.ProductCreateRequest;
 import bullish.store.communication.product.ProductUpdateRequest;
+import bullish.store.configuration.jwt.JwtAuthFilter;
+import bullish.store.configuration.jwt.JwtService;
 import bullish.store.entity.ProductEntity;
 import bullish.store.exception.product.ProductConflictException;
 import bullish.store.exception.product.ProductNotFoundException;
@@ -11,10 +13,12 @@ import bullish.store.service.product.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +34,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@Import({JwtAuthFilter.class, JwtService.class})
 class ProductControllerTest {
 
     @MockBean
@@ -75,7 +81,7 @@ class ProductControllerTest {
 
     @Test
     void ShouldReturnStatusCreatedAndCreatedProduct() throws Exception {
-        ProductCreateRequest createRequest = new ProductCreateRequest("New Product", "New Description", BigDecimal.TEN, 1L);
+        ProductCreateRequest createRequest = new ProductCreateRequest("New Product", "New Description", BigDecimal.TEN);
 
         ProductEntity savedProduct = new ProductEntity("New Product", "New Description", BigDecimal.TEN);
 

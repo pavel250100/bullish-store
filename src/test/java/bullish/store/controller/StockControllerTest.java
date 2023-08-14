@@ -3,6 +3,8 @@ package bullish.store.controller;
 import bullish.store.assembler.ProductModelAssembler;
 import bullish.store.assembler.StockModelAssembler;
 import bullish.store.communication.stock.StockUpdateRequest;
+import bullish.store.configuration.jwt.JwtAuthFilter;
+import bullish.store.configuration.jwt.JwtService;
 import bullish.store.entity.StockEntity;
 import bullish.store.exception.stock.StockConflictException;
 import bullish.store.exception.stock.StockNotFoundException;
@@ -10,11 +12,14 @@ import bullish.store.service.stock.StockService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -28,6 +33,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(StockController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@Import({JwtAuthFilter.class, JwtService.class})
 class StockControllerTest {
 
     @MockBean
@@ -47,6 +54,7 @@ class StockControllerTest {
         public ProductModelAssembler productModelAssembler() { return new ProductModelAssembler(); }
     }
 
+    @NonNull
     private StockEntity dummyStock() {
         StockEntity stock = new StockEntity();
         stock.setProductId(1L);

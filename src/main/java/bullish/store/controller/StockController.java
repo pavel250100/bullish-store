@@ -10,6 +10,7 @@ import bullish.store.service.stock.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class StockController {
     }
 
     @PutMapping("/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public EntityModel<Stock> update(
             @PathVariable Long productId,
             @RequestBody StockUpdateRequest request

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-@Table(name = "product")
+@Table(name = "products")
 @EntityListeners(AuditingEntityListener.class)
 @Entity(name = "product")
 public @Data class ProductEntity {
