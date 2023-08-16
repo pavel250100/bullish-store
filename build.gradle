@@ -32,6 +32,7 @@ dependencies {
     testImplementation testLibs.jupiter.api
     testImplementation testLibs.bundles.spring.test
     testImplementation testLibs.mockito.inline
+    testImplementation testLibs.bundles.cucumber
     testRuntimeOnly testLibs.jupiter.engine
     testRuntimeOnly libs.h2
 }

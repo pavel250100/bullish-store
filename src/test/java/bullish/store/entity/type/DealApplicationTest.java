@@ -146,4 +146,26 @@ class DealApplicationTest {
         assertEquals(totalPrice, expectedPrice);
     }
 
+    @Test
+    public void ShouldNotApplyDiscountOnEachSecondItem_WhenOrder4() {
+        CartItemEntity cartItem = new CartItemEntity();
+        cartItem.setQuantity(4L); // only 2 products, not 3
+
+        ProductEntity product = new ProductEntity();
+        product.setPrice(BigDecimal.valueOf(100));
+
+        DealEntity deal = new DealEntity();
+        deal.setProduct(product);
+        deal.setDealType(DealType.BUY_N_GET_DISCOUNT_ON_N_PLUS_1);
+        deal.setBuyQuantity(1L); // need to buy 3
+        deal.setDiscountPercentage(BigDecimal.valueOf(50));
+        product.setDeal(deal);
+        cartItem.setProduct(product);
+
+        BigDecimal totalPrice = cartItem.totalPrice();
+        BigDecimal expectedPrice = BigDecimal.valueOf(300).setScale(5, RoundingMode.HALF_UP);
+
+        assertEquals(totalPrice, expectedPrice);
+    }
+
 }
