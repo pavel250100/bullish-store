@@ -55,8 +55,8 @@ class CartServiceImplTest {
 
         try (MockedStatic<AuthUtil> mockedAuthUtil = Mockito.mockStatic(AuthUtil.class)) {
             mockedAuthUtil.when(AuthUtil::extractUsernameFromContext).thenReturn(username);
-            CartEntity result = cartService.addProduct(request);
-            assertEquals(result.getItems().size(), 1);
+            cartService.addProduct(request);
+            assertEquals(cart.getItems().size(), 1);
         }
     }
 

@@ -53,7 +53,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
+    @WithMockUser(authorities = {"ADMIN"})
     void OnlyAdminsCanGetAllUsers() throws Exception {
         mockMvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -69,7 +69,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockUser(authorities = "user-1")
     void RestrictGetAllUsersFromUsers() throws Exception {
         mockMvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -77,7 +77,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockUser(username = "user-1", authorities = {"USER"})
     void RestrictGetUserToCallingUserOnly() throws Exception {
         mockMvc.perform(get("/users/{}", "another-username")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -85,7 +85,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockUser(username = "user-1", authorities = {"USER"})
     void AllowGetUserToCallingUserOnly() throws Exception {
         when(userService.getByUsername("user-1")).thenReturn(dummyUser());
         mockMvc.perform(get("/users/{username}", "user-1")
@@ -94,7 +94,7 @@ class UserControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     void AllowGetUserToAdmins() throws Exception {
         when(userService.getByUsername("user-1")).thenReturn(dummyUser());
         mockMvc.perform(get("/users/{username}", "user-1")

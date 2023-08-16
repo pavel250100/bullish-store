@@ -3,6 +3,7 @@ package bullish.store.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +29,21 @@ public @Data class CartEntity {
     private List<CartItemEntity> items = new ArrayList<>();
 
     public void addItem(CartItemEntity item) {
-        items.add(item);
         item.setCart(this);
+        items.add(item);
     }
 
     public void removeItem(CartItemEntity item) {
-        items.remove(item);
         item.setCart(null);
+        items.remove(item);
+    }
+
+    public BigDecimal totalPrice() {
+        return items.stream().map(CartItemEntity::totalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal totalDiscount() {
+        return items.stream().map(CartItemEntity::totalDiscount).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 }

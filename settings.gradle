@@ -3,6 +3,7 @@ rootProject.name = 'bullish-store'
 // central place for all dependencies which are shared with the same version between modules
 def springVersion = "3.1.2"
 def jwtVersion = "0.11.5"
+def cucumberVersion = "6.10.4"
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -41,6 +42,10 @@ dependencyResolutionManagement {
             library("spring.security.test", "org.springframework.security", "spring-security-test").version("6.1.2")
             library("spring.boot", "org.springframework.boot", "spring-boot-starter-test").version(springVersion)
             bundle("spring.test", ["spring.security.test", "spring.boot"])
+
+            // cucumber
+            library("cucumber.java", "io.cucumber", "cucumber-java").version(cucumberVersion)
+            library("cucumber.junit", "io.cucumber", "cucumber-junit").version(cucumberVersion)
         }
     }
 }

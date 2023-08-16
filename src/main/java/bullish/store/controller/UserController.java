@@ -24,7 +24,7 @@ public class UserController {
     private final UserModelAssembler assembler;
 
     @GetMapping("/{username}")
-    @PreAuthorize("#username == authentication.principal.username or hasRole('ADMIN')")
+    @PreAuthorize("#username == authentication.principal.username or hasAuthority('ADMIN')")
     public EntityModel<User> getUserByUsername(@PathVariable String username) {
         UserEntity userEntity = userService.getByUsername(username);
         User user = User.toDto(userEntity);
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public CollectionModel<EntityModel<User>> getAll() {
         List<UserEntity> entities = userService.getAll();
         List<User> users = User.toDtoList(entities);

@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface CartService {
 
-    CartEntity addProduct(CartAddProductRequest request);
-    CartEntity removeProduct(Long productId);
+    void addProduct(CartAddProductRequest request);
+    void removeProduct(Long productId);
     CartEntity getCart();
 
 }

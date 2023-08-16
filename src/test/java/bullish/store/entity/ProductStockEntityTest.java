@@ -78,7 +78,7 @@ class ProductStockEntityTest {
 
         StockEntity foundStockEntity = entityManager.find(StockEntity.class, savedProductEntity.getId());
         assertNotNull(foundStockEntity);
-        assertEquals(savedProductEntity, foundStockEntity.getProductEntity());
+        assertEquals(savedProductEntity, foundStockEntity.getProduct());
         assertEquals(0, foundStockEntity.getQuantity());
     }
 
@@ -104,13 +104,13 @@ class ProductStockEntityTest {
 
         StockEntity newStockEntity = entityManager.find(StockEntity.class, savedProductEntity.getId());
         assertEquals(newStockEntity.getVersion(), 0L);
-        assertEquals(newStockEntity.getProductEntity().getVersion(), 0L);
+        assertEquals(newStockEntity.getProduct().getVersion(), 0L);
         ZonedDateTime initialLastUpdatedAt = newStockEntity.getLastUpdatedAt();
 
         newStockEntity.setQuantity(15L);
         StockEntity updatedStockEntity = entityManager.persistAndFlush(newStockEntity);
         assertEquals(updatedStockEntity.getVersion(), 1L);
-        assertEquals(updatedStockEntity.getProductEntity().getVersion(), 0L);
+        assertEquals(updatedStockEntity.getProduct().getVersion(), 0L);
 
         assertNotNull(updatedStockEntity.getLastUpdatedAt());
         assertTrue(updatedStockEntity.getLastUpdatedAt().isAfter(initialLastUpdatedAt));

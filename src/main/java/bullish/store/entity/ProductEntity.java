@@ -3,16 +3,21 @@ package bullish.store.entity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "products")
 @EntityListeners(AuditingEntityListener.class)
 @Entity(name = "product")
+@EqualsAndHashCode(exclude = {"stock", "deal"})
 public @Data class ProductEntity {
 
     @Id
@@ -32,12 +37,15 @@ public @Data class ProductEntity {
     private Long version;
 
     @OneToOne(
-            mappedBy = "productEntity",
+            mappedBy = "product",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private StockEntity stock;
+
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL)
+    private DealEntity deal;
 
     @Builder(toBuilder = true)
     public ProductEntity(String name, String desc, BigDecimal price) {
@@ -47,25 +55,37 @@ public @Data class ProductEntity {
         createStock();
     }
 
+    public void setStock(StockEntity stock) {
+        stock.setProduct(this);
+        this.stock = stock;
+    }
+
     public ProductEntity() {
         createStock();
     }
 
     private void createStock() {
         StockEntity stockEntity = new StockEntity();
-        stockEntity.setProductEntity(this);
+        stockEntity.setProduct(this);
         stockEntity.setQuantity(0L);
         this.stock = stockEntity;
     }
 
+    public String getDealDescription() {
+        if (deal != null) {
+            return deal.getDealDescription();
+        }
+        return "No deal available";
+    }
+
     @PrePersist
     protected void onCreate() {
-        createdAt = lastUpdatedAt = ZonedDateTime.now();
+        createdAt = lastUpdatedAt = ZonedDateTime.now(ZoneOffset.UTC);
     }
 
     @PreUpdate
     protected void onUpdate() {
-        lastUpdatedAt = ZonedDateTime.now();
+        lastUpdatedAt = ZonedDateTime.now(ZoneOffset.UTC);
     }
 
     @Override

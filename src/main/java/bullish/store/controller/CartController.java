@@ -20,23 +20,21 @@ public class CartController {
     private final CartModelAssembler assembler;
 
     @PutMapping
-    @PreAuthorize("hasRole('USER')")
-    public EntityModel<Cart> addProduct(@RequestBody CartAddProductRequest request) {
-        CartEntity cartEntity = cartService.addProduct(request);
-        Cart cart = Cart.toDto(cartEntity);
-        return assembler.toModel(cart);
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<?> addProduct(@RequestBody CartAddProductRequest request) {
+        cartService.addProduct(request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{productId}")
-    @PreAuthorize("hasRole('USER')")
-    public EntityModel<Cart> removeProduct(@PathVariable Long productId) {
-        CartEntity cartEntity = cartService.removeProduct(productId);
-        Cart cart = Cart.toDto(cartEntity);
-        return assembler.toModel(cart);
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<?> removeProduct(@PathVariable Long productId) {
+        cartService.removeProduct(productId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('USER')")
     public EntityModel<Cart> getCart() {
         CartEntity cartEntity = cartService.getCart();
         Cart cart = Cart.toDto(cartEntity);

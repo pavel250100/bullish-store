@@ -84,7 +84,7 @@ class ProductControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
+    @WithMockUser(authorities = {"ADMIN"})
     public void CreateProductShouldBeAllowedToAdmins() throws Exception {
         ProductCreateRequest request =
                 ProductCreateRequest.builder().name("product").desc("desc").price(BigDecimal.TEN).build();
@@ -107,7 +107,7 @@ class ProductControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
+    @WithMockUser(authorities = {"ADMIN"})
     public void UpdateProductShouldBeAvailableToAdmins() throws Exception {
         ProductUpdateRequest request = ProductUpdateRequest.builder().name("name").price(BigDecimal.TEN).version(1L).build();
         when(productService.update(1L, request)).thenReturn(dummyProduct());
@@ -127,7 +127,7 @@ class ProductControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
+    @WithMockUser(authorities = {"ADMIN"})
     public void DeleteProductShouldBeAvailableToAdmins() throws Exception {
         doNothing().when(productService).deleteById(any());
         mockMvc.perform(delete("/products/{productId}", 1L)

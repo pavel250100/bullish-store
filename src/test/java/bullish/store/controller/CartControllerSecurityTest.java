@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,7 +49,7 @@ class CartControllerSecurityTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
+    @WithMockUser(authorities = {"ADMIN"})
     public void AddProductShouldBeRestrictedToAdmins() throws Exception {
         CartAddProductRequest request = CartAddProductRequest.builder().productId(1L).quantity(10L).build();
         mockMvc.perform(put("/cart", 1L)
@@ -68,7 +69,7 @@ class CartControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = {"USER"})
     public void AddProductShouldBeAvailableToAuthenticatedUser() throws Exception {
         CartAddProductRequest request = CartAddProductRequest.builder().productId(1L).quantity(10L).build();
         CartEntity cart = new CartEntity();
@@ -78,7 +79,7 @@ class CartControllerSecurityTest {
         cartItem.setProduct(product);
         cartItem.setQuantity(request.getQuantity());
         cart.setItems(new ArrayList<>(List.of(cartItem)));
-        when(cartService.addProduct(request)).thenReturn(cart);
+        doNothing().when(cartService).addProduct(request);
         mockMvc.perform(put("/cart", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))

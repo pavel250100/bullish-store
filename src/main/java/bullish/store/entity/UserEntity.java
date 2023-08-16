@@ -32,6 +32,7 @@ public @Data class UserEntity {
     @MapsId
     private UserDetailsEntity details;
 
+    @Builder.Default
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role_mapping",
@@ -47,13 +48,17 @@ public @Data class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderEntity> orders = new ArrayList<>();
 
+    public void addOrder(OrderEntity order) {
+        order.setUser(this);
+        orders.add(order);
+    }
+
     @PrePersist
     private void initializeCart() {
         if (this.cart == null) {
-            CartEntity cart = CartEntity.builder()
+            this.cart = CartEntity.builder()
                     .user(this)
                     .build();
-            this.cart = cart;
         }
     }
 

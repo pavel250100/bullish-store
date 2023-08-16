@@ -1,18 +1,18 @@
 package bullish.store.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity(name = "order_item")
 @Table(name = "order_items")
+@EqualsAndHashCode(exclude = {"order", "product"})
 public @Data class OrderItemEntity {
 
     @Id
@@ -28,9 +28,13 @@ public @Data class OrderItemEntity {
     private ProductEntity product;
 
     @Column(name = "quantity")
-    private Integer quantity;
+    private Long quantity;
 
     @Column(name = "price_when_ordered")
     private BigDecimal priceWhenOrdered;
+
+    private String dealApplied;
+    private BigDecimal totalPrice;
+    private BigDecimal totalDiscount;
 
 }

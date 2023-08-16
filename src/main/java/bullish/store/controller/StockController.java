@@ -38,7 +38,7 @@ public class StockController {
     }
 
     @PutMapping("/{productId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public EntityModel<Stock> update(
             @PathVariable Long productId,
             @RequestBody StockUpdateRequest request

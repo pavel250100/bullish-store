@@ -81,7 +81,7 @@ class StockControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
+    @WithMockUser(authorities = {"ADMIN"})
     void UpdateStockShouldBeAvailableToAdmins() throws Exception {
         StockUpdateRequest request = new StockUpdateRequest(10L, 1L);
         when(stockService.update(1L, request)).thenReturn(dummyStock());

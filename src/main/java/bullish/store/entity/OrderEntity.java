@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +28,21 @@ public @Data class OrderEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItemEntity> items = new ArrayList<>();
 
     private ZonedDateTime orderDate;
     private BigDecimal totalPrice;
+    private BigDecimal totalDiscount;
 
     @PrePersist
     protected void onCreate() {
-        orderDate = ZonedDateTime.now();
+        orderDate = ZonedDateTime.now(ZoneOffset.UTC);
     }
 
+    public void addOrderItem(OrderItemEntity orderItem) {
+        orderItem.setOrder(this);
+        items.add(orderItem);
+    }
 }
