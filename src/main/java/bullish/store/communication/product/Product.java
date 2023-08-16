@@ -21,6 +21,7 @@ public @Data class Product {
     private BigDecimal price;
     private ZonedDateTime createdAt;
     private ZonedDateTime lastUpdatedAt;
+    private String deal;
 
     public static Product toDto(ProductEntity productEntity) {
         return Product.builder()
@@ -28,6 +29,7 @@ public @Data class Product {
                 .name(productEntity.getName())
                 .desc(productEntity.getDesc())
                 .price(productEntity.getPrice())
+                .deal(productEntity.getDealDescription())
                 .createdAt(productEntity.getCreatedAt())
                 .lastUpdatedAt(productEntity.getLastUpdatedAt())
                 .build();
