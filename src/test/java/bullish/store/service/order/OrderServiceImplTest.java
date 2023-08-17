@@ -74,12 +74,20 @@ class OrderServiceImplTest {
 
     @Test
     public void ShouldPlaceOrderSuccessfully() {
-        when(cartRepository.findByUsername(username)).thenReturn(Optional.of(dummyCart()));
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(dummyUser()));
+        CartEntity cart = dummyCart();
+        UserEntity user = dummyUser();
+        when(cartRepository.findByUsername(username)).thenReturn(Optional.of(cart));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         try (MockedStatic<AuthUtil> mockedAuthUtil = Mockito.mockStatic(AuthUtil.class)) {
             mockedAuthUtil.when(AuthUtil::extractUsernameFromContext).thenReturn(username);
             OrderEntity order = orderService.placeOrder();
             assertEquals(order.getTotalPrice(), new BigDecimal(110).setScale(5, RoundingMode.HALF_UP));
+            assertEquals(cart.getItems().size(), 0);
+            assertEquals(user.getOrders().size(), 1);
+            for (CartItemEntity cartItem: cart.getItems()) {
+                StockEntity stock = cartItem.getProduct().getStock();
+                assertEquals(stock.getQuantity(), 0);
+            }
         }
     }
 
