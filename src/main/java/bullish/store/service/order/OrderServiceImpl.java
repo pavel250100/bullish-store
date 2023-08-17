@@ -9,6 +9,7 @@ import bullish.store.repository.UserRepository;
 import bullish.store.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -22,7 +23,8 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
 
-    @Transactional
+    // Repeatable read to prevent race condition
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public OrderEntity placeOrder() {
         String username = AuthUtil.extractUsernameFromContext();

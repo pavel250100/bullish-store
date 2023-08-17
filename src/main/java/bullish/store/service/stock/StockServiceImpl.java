@@ -7,6 +7,7 @@ import bullish.store.exception.stock.StockNotFoundException;
 import bullish.store.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class StockServiceImpl implements StockService {
         return stockRepository.findAll();
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public StockEntity update(Long productId, StockUpdateRequest request) {
         StockEntity existingStockEntity = this.getByProductId(productId);

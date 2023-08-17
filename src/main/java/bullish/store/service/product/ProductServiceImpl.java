@@ -8,6 +8,7 @@ import bullish.store.exception.product.ProductNotFoundException;
 import bullish.store.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(productEntity);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public ProductEntity update(Long id, ProductUpdateRequest request) {
         ProductEntity existingProductEntity = this.getById(id);
@@ -55,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
         return existingProductEntity;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public void deleteById(Long id) {
         productRepository.deleteById(id);
