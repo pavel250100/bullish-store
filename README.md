@@ -23,6 +23,10 @@ This service uses JSON Web Token (JWT) for authentication, ensuring secure commu
 To ensure data integrity and concurrent safeness, our service utilizes the Optimistic Locking technique. 
 This approach prevents conflicts and data inconsistencies when multiple transactions try to modify the same data simultaneously.
 
+Note: Locking is applied to update product & stock only, since several admins can do that in the same time,
+however for cart, orders, user details it is assumed that only 1 user is updating details. 
+In real world such type of locking should be applied to them as well.
+
 ### Transactional Safety
 The service leverages the `@Transactional` annotation from Spring Framework to manage database transactions. 
 This ensures that all database transactions are performed in the correct order, providing a consistent state and preventing data inconsistencies.
