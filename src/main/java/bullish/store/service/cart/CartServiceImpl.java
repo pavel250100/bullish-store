@@ -28,7 +28,7 @@ public class CartServiceImpl implements CartService {
     public final ProductRepository productRepository;
     public final CartRepository cartRepository;
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public void addProductToCart(CartAddProductRequest request) {
         String username = AuthUtil.extractUsernameFromContext();
