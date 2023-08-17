@@ -44,7 +44,7 @@ As an administrator, you have access to several endpoints to manage products:
 1. **Create a Product:** Add a new product to the inventory.
 2. **Update a Product:** Modify the details of an existing product.
 3. **Update Product Stock:** Adjust the stock level of a specific product.
-4. **Delete a Product:** Completely remove a product from the inventory.
+4. **Delete a Product:** Remove a product from the stock.
 
 ### User Endpoints
 As a user, you can interact with the service through the following endpoints:
