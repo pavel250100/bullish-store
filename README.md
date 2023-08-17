@@ -14,6 +14,10 @@ To run tests, you can also use two methods:
 
 **Gradle (Java 17 is a prerequisite):** `./gradlew test`
 
+## API Docs
+You can find API endpoints after starting up a service at this path:
+http://localhost:8080/swagger-ui/index.html
+
 ## Features
 
 ### JWT Authentication

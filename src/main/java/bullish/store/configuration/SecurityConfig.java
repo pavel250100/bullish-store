@@ -32,6 +32,7 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                             .requestMatchers(HttpMethod.GET, "/stock/**").permitAll()
                             .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                             .anyRequest().authenticated()
                 )
                 .sessionManagement((configurer) ->

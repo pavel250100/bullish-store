@@ -21,6 +21,7 @@ dependencies {
     implementation libs.logback
     implementation libs.bundles.spring
     implementation libs.bundles.jwt
+    implementation libs.spring.doc
 
     runtimeOnly libs.h2
 
