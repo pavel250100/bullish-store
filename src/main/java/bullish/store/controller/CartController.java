@@ -22,14 +22,14 @@ public class CartController {
     @PutMapping
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<?> addProduct(@RequestBody CartAddProductRequest request) {
-        cartService.addProduct(request);
+        cartService.addProductToCart(request);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<?> removeProduct(@PathVariable Long productId) {
-        cartService.removeProduct(productId);
+        cartService.removeProductFromCart(productId);
         return ResponseEntity.ok().build();
     }
 

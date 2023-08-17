@@ -55,7 +55,7 @@ class CartServiceImplTest {
 
         try (MockedStatic<AuthUtil> mockedAuthUtil = Mockito.mockStatic(AuthUtil.class)) {
             mockedAuthUtil.when(AuthUtil::extractUsernameFromContext).thenReturn(username);
-            cartService.addProduct(request);
+            cartService.addProductToCart(request);
             assertEquals(cart.getItems().size(), 1);
         }
     }
@@ -75,7 +75,7 @@ class CartServiceImplTest {
 
         try (MockedStatic<AuthUtil> mockedAuthUtil = Mockito.mockStatic(AuthUtil.class)) {
             mockedAuthUtil.when(AuthUtil::extractUsernameFromContext).thenReturn(username);
-            cartService.removeProduct(productIdToRemove);
+            cartService.removeProductFromCart(productIdToRemove);
             assertEquals(cart.getItems().size(), 0);
         }
     }

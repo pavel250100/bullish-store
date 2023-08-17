@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,7 +78,7 @@ class CartControllerSecurityTest {
         cartItem.setProduct(product);
         cartItem.setQuantity(request.getQuantity());
         cart.setItems(new ArrayList<>(List.of(cartItem)));
-        doNothing().when(cartService).addProduct(request);
+        doNothing().when(cartService).addProductToCart(request);
         mockMvc.perform(put("/cart", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))

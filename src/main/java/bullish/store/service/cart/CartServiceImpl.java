@@ -14,6 +14,7 @@ import bullish.store.repository.ProductRepository;
 import bullish.store.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -29,7 +30,7 @@ public class CartServiceImpl implements CartService {
 
     @Transactional
     @Override
-    public void addProduct(CartAddProductRequest request) {
+    public void addProductToCart(CartAddProductRequest request) {
         String username = AuthUtil.extractUsernameFromContext();
 
         ProductEntity product = productRepository.findById(request.getProductId())
@@ -72,9 +73,9 @@ public class CartServiceImpl implements CartService {
         cart.addItem(itemToAdd);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
-    public void removeProduct(Long productId) {
+    public void removeProductFromCart(Long productId) {
         String username = AuthUtil.extractUsernameFromContext();
 
         CartEntity cart = cartRepository.findByUsername(username)
