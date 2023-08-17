@@ -46,15 +46,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductEntity update(Long id, ProductUpdateRequest request) {
         ProductEntity existingProductEntity = this.getById(id);
-        if (!existingProductEntity.getVersion().equals(request.getVersion())) {
+        if (request.getVersion() < existingProductEntity.getVersion()) {
             throw new ProductConflictException(existingProductEntity);
         }
-        existingProductEntity.toBuilder()
-                .price(request.getPrice())
-                .name(request.getName())
-                .desc(request.getDesc())
-                .build();
-        return productRepository.save(existingProductEntity);
+        existingProductEntity.setPrice(request.getPrice());
+        existingProductEntity.setDesc(request.getDesc());
+        existingProductEntity.setName(request.getName());
+        return existingProductEntity;
     }
 
     @Transactional
