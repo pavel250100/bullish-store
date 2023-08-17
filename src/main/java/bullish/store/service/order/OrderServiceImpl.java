@@ -23,8 +23,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
 
-    // Repeatable read to prevent race condition
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public OrderEntity placeOrder() {
         String username = AuthUtil.extractUsernameFromContext();
