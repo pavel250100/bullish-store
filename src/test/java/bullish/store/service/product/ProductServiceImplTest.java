@@ -85,7 +85,6 @@ class ProductServiceImplTest {
         ProductUpdateRequest request = new ProductUpdateRequest("New Product 1", "New Desc 1", BigDecimal.valueOf(150), 1L);
         ProductEntity existingProductEntity = dummyProduct(1L, "Product 1", "Desc 1", BigDecimal.valueOf(100), 1L);
         when(productRepository.findById(1L)).thenReturn(Optional.of(existingProductEntity));
-        when(productRepository.save(any())).thenReturn(existingProductEntity);
 
         ProductEntity actualProductEntity = productService.update(1L, request);
 
