@@ -120,7 +120,7 @@ class ProductControllerSecurityTest {
     @Test
     @WithAnonymousUser
     public void DeleteProductShouldBeRestrictedToUsers() throws Exception {
-        doNothing().when(productService).deleteById(any());
+        doNothing().when(productService).removeProductFromStock(any());
         mockMvc.perform(delete("/products/{productId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -129,7 +129,7 @@ class ProductControllerSecurityTest {
     @Test
     @WithMockUser(authorities = {"ADMIN"})
     public void DeleteProductShouldBeAvailableToAdmins() throws Exception {
-        doNothing().when(productService).deleteById(any());
+        doNothing().when(productService).removeProductFromStock(any());
         mockMvc.perform(delete("/products/{productId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());

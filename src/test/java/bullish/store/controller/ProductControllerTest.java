@@ -182,7 +182,7 @@ class ProductControllerTest {
     void ShouldDeleteProductAndReturnStatusNoContent() throws Exception {
         Long productId = 1L;
 
-        doNothing().when(productService).deleteById(productId);
+        doNothing().when(productService).removeProductFromStock(productId);
 
         mockMvc.perform(delete("/products/{id}", productId)
                         .contentType(MediaType.APPLICATION_JSON))

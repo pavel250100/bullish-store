@@ -3,6 +3,7 @@ package bullish.store.service.product;
 import bullish.store.communication.product.ProductCreateRequest;
 import bullish.store.communication.product.ProductUpdateRequest;
 import bullish.store.entity.ProductEntity;
+import bullish.store.entity.StockEntity;
 import bullish.store.exception.product.ProductConflictException;
 import bullish.store.exception.product.ProductNotFoundException;
 import bullish.store.repository.ProductRepository;
@@ -102,9 +103,15 @@ class ProductServiceImplTest {
     }
 
     @Test
-    public void ShouldCallDeleteById() {
-        productService.deleteById(1L);
-        verify(productRepository).deleteById(1L);
+    public void ShouldRemoveProductFromStock() {
+        ProductEntity product = dummyProduct(1L, "Product 1", "Desc 1", BigDecimal.valueOf(100), 1L);
+        StockEntity stock = new StockEntity();
+        stock.setProduct(product);
+        stock.setQuantity(10L);
+        product.setStock(stock);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        productService.removeProductFromStock(1L);
+        assertEquals(product.getStock().getQuantity(), 0L);
     }
 
 

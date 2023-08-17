@@ -61,7 +61,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteById(@PathVariable Long id) {
-        productService.deleteById(id);
+        productService.removeProductFromStock(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -58,7 +58,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
-    public void deleteById(Long id) {
-        productRepository.deleteById(id);
+    public void removeProductFromStock(Long id) {
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        product.getStock().setQuantity(0L);
     }
 }

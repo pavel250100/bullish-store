@@ -13,6 +13,6 @@ public interface ProductService {
         List<ProductEntity> getAll();
         ProductEntity create(ProductCreateRequest request);
         ProductEntity update(Long id, ProductUpdateRequest request);
-        void deleteById(Long id);
+        void removeProductFromStock(Long id);
 
 }
