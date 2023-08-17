@@ -46,6 +46,10 @@ As a user, you can interact with the service through the following endpoints:
 2. **Delete a Product from Cart:** Remove a product from your shopping cart.
 3. **Checkout:** Complete the purchase of all items in your cart.
 
+### Default users
+Admin rights: username=`admin`, password=`admin`
+User rights: username=`user`, password=`user`
+
 ### Deals
 Service offers three types of special deals:
 
