@@ -24,7 +24,7 @@ public class StockServiceImpl implements StockService {
         return stockRepository.findAll();
     }
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public StockEntity update(Long productId, StockUpdateRequest request) {
         StockEntity existingStockEntity = this.getByProductId(productId);
