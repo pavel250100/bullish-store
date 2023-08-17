@@ -22,16 +22,18 @@ public @Data class Product {
     private ZonedDateTime createdAt;
     private ZonedDateTime lastUpdatedAt;
     private String deal;
+    private Long version;
 
-    public static Product toDto(ProductEntity productEntity) {
+    public static Product toDto(ProductEntity product) {
         return Product.builder()
-                .id(productEntity.getId())
-                .name(productEntity.getName())
-                .desc(productEntity.getDesc())
-                .price(productEntity.getPrice())
-                .deal(productEntity.getDealDescription())
-                .createdAt(productEntity.getCreatedAt())
-                .lastUpdatedAt(productEntity.getLastUpdatedAt())
+                .id(product.getId())
+                .name(product.getName())
+                .desc(product.getDesc())
+                .price(product.getPrice())
+                .deal(product.getDealDescription())
+                .createdAt(product.getCreatedAt())
+                .lastUpdatedAt(product.getLastUpdatedAt())
+                .version(product.getVersion())
                 .build();
     }
 

@@ -58,11 +58,18 @@ public class OrderServiceImpl implements OrderService {
 
             totalPrice = totalPrice.add(itemTotalPrice);
             totalDiscount = totalDiscount.add(itemTotalDiscount);
+
+            // decrease a stock
+            StockEntity existingStock = orderItem.getProduct().getStock();
+            existingStock.setQuantity(existingStock.getQuantity() - cartItem.getQuantity());
         }
 
         newOrder.setTotalPrice(totalPrice);
         newOrder.setTotalDiscount(totalDiscount);
+
+        // clean a cart
         cart.getItems().clear();
+
         user.addOrder(newOrder);
 
         return newOrder;

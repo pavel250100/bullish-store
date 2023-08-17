@@ -18,7 +18,8 @@ dependencyResolutionManagement {
             library("spring.data.jpa", "org.springframework.boot", "spring-boot-starter-data-jpa").version(springVersion)
             library("spring.hateoas", "org.springframework.boot", "spring-boot-starter-hateoas").version(springVersion)
             library("spring.security", "org.springframework.boot", "spring-boot-starter-security").version(springVersion)
-            bundle("spring", ["spring.web", "spring.data.jpa", "spring.hateoas", "spring.security"])
+            library("spring.parent", "org.springframework.boot", "spring-boot-starter-parent").version(springVersion)
+            bundle("spring", ["spring.web", "spring.data.jpa", "spring.hateoas", "spring.security", "spring.parent"])
 
             // jwt
             library("jwt.impl", "io.jsonwebtoken", "jjwt-impl").version(jwtVersion)
@@ -37,6 +38,8 @@ dependencyResolutionManagement {
             library("jupiter.api", "org.junit.jupiter", "junit-jupiter-api").versionRef(junitVersion)
             library("jupiter.engine", "org.junit.jupiter", "junit-jupiter-engine").versionRef(junitVersion)
             library("mockito.inline", "org.mockito", "mockito-inline").version("5.2.0")
+
+            library("junit", "junit", "junit").version("4.13.1")
 
             // spring test
             library("spring.security.test", "org.springframework.security", "spring-security-test").version("6.1.2")
