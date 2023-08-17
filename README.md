@@ -18,6 +18,9 @@ To run tests, you can also use two methods:
 You can find API endpoints after starting up a service at this path:
 http://localhost:8080/swagger-ui/index.html
 
+Note: some endpoints are secured, since involved authorities, so you have to attach a jwt token which you get after authorization.
+Attach it to `Authorization` header like `Bearer <jwt>`. More information below.
+
 ## Features
 
 ### JWT Authentication
